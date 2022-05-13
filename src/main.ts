@@ -1,16 +1,29 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as session from 'express-session';
 import * as passport from 'passport';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { createClient } from 'redis';
+import * as createRedisStore from 'connect-redis';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
+  const RedisStore = createRedisStore(session);
+  const redisClient = createClient({ legacyMode: true, host: 'localhost', port: 6379 });
+
+  redisClient.on('error', (err) => {
+    new Logger('REDIS').error('Could not establish a connection with redis. ' + err);
+  });
+  redisClient.on('connect', () => {
+    new Logger('REDIS').log('Connected to redis successfully');
+  });
+
   app.use(
     session({
+      store: new RedisStore({ client: redisClient }),
       secret: process.env.SESSION_SECRET,
       resave: false,
       saveUninitialized: false,
