@@ -21,7 +21,7 @@ export class AuthService {
     return null;
   }
 
-  logout(request: Request): String {
+  logout(request: Request): string {
     request.logout();
     request.session.cookie.maxAge = 0;
     return '로그아웃 성공';
