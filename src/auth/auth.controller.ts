@@ -8,7 +8,7 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { Request } from 'express';
-import { LoginRequestDto } from './dto/login-request-dto';
+import { LoginDto } from './dto/login.dto';
 import { UserResponseDto } from '../users/dto/user-response.dto';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './local-auth-guard';
@@ -22,7 +22,7 @@ export class AuthController {
   @ApiOperation({
     summary: '로그인',
   })
-  @ApiBody({ type: LoginRequestDto })
+  @ApiBody({ type: LoginDto })
   @ApiOkResponse({
     description: '로그인 성공',
     type: UserResponseDto,

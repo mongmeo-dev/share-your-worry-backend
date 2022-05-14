@@ -1,31 +1,32 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from './entity/user.entity';
-import { DeleteResult, Repository } from 'typeorm';
-import { JoinRequestDto } from './dto/join-request.dto';
+import { UserEntity } from './entity/user.entity';
+import { Repository } from 'typeorm';
+import { JoinDto } from './dto/join.dto';
 import { UserResponseDto } from './dto/user-response.dto';
 import * as bcrypt from 'bcrypt';
-import { UserUpdateRequestDto } from './dto/user-update-request.dto';
 import { Request } from 'express';
+import { Utils } from '../common/utils';
+import { UserUpdateDto } from './dto/user-update.dto';
+import { PostResponseDto } from '../posts/dto/post-response.dto';
+import { PostEntity } from '../posts/entity/post.entity';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectRepository(User) private readonly usersRepository: Repository<User>) {}
+  constructor(
+    @InjectRepository(UserEntity) private readonly usersRepository: Repository<UserEntity>,
+    @InjectRepository(PostEntity) private readonly postsRepository: Repository<PostEntity>,
+  ) {}
 
-  private removePasswordFromUser(user: User): UserResponseDto {
-    const { password, ...responseData } = user;
-    return responseData;
-  }
+  async join(joinDto: JoinDto): Promise<UserResponseDto> {
+    await this.checkEmailAndNicknameOverlap(joinDto.email, joinDto.nickname);
 
-  async join(joinRequestDto: JoinRequestDto): Promise<UserResponseDto> {
-    await this.checkEmailAndNicknameOverlap(joinRequestDto.email, joinRequestDto.nickname);
+    const hashedPassword = await bcrypt.hash(joinDto.password, 12);
+    joinDto.password = hashedPassword;
 
-    const hashedPassword = await bcrypt.hash(joinRequestDto.password, 12);
-    joinRequestDto.password = hashedPassword;
+    const newUser = await this.usersRepository.save(joinDto);
 
-    const newUser = await this.usersRepository.save(joinRequestDto);
-
-    return this.removePasswordFromUser(newUser);
+    return Utils.removePasswordFromUser(newUser);
   }
 
   private async checkEmailAndNicknameOverlap(email: string, nickname: string): Promise<void> {
@@ -41,33 +42,35 @@ export class UsersService {
   async getUserById(id: number): Promise<UserResponseDto> {
     try {
       const user = await this.usersRepository.findOneOrFail({ id });
-      return this.removePasswordFromUser(user);
+      return Utils.removePasswordFromUser(user);
     } catch (err) {
       throw new NotFoundException('유저를 찾을 수 없습니다.');
     }
   }
 
-  async updateUserById(
-    id: number,
-    userUpdateRequestDto: UserUpdateRequestDto,
-  ): Promise<UserResponseDto> {
+  async updateUserById(id: number, userUpdateDto: UserUpdateDto): Promise<UserResponseDto> {
     const user = await this.getUserById(id);
 
-    if (userUpdateRequestDto.nickname) {
-      await this.checkEmailAndNicknameOverlap(null, userUpdateRequestDto.nickname);
+    if (userUpdateDto.nickname) {
+      await this.checkEmailAndNicknameOverlap(null, userUpdateDto.nickname);
     }
 
-    const updatedUser = await this.usersRepository.save({ ...user, ...userUpdateRequestDto });
-    return this.removePasswordFromUser(updatedUser);
+    const updatedUser = await this.usersRepository.save({ ...user, ...userUpdateDto });
+    return Utils.removePasswordFromUser(updatedUser);
   }
 
-  async logoutAndDeleteUserById(request: Request, id: number): Promise<DeleteResult> {
+  async logoutAndDeleteUserById(request: Request, id: number): Promise<void> {
     request.logout();
     request.session.cookie.maxAge = 0;
-    return await this.usersRepository.delete({ id });
+    await this.usersRepository.delete({ id });
   }
 
-  async getAllPostByUserId(id: number) {
-    // TODO: Post 서비스 완성되면 구현할 것.
+  async getAllPostByUserId(id: number): Promise<PostResponseDto[]> {
+    const posts = await this.postsRepository.find({
+      where: { id },
+      relations: ['author', 'category'],
+    });
+
+    return posts.map((post) => Utils.postEntityToPostResponseDto(post));
   }
 }

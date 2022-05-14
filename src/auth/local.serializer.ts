@@ -1,16 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { PassportSerializer } from '@nestjs/passport';
-import { User } from '../users/entity/user.entity';
+import { UserEntity } from '../users/entity/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 @Injectable()
 export class LocalSerializer extends PassportSerializer {
-  constructor(@InjectRepository(User) private readonly usersRepository: Repository<User>) {
+  constructor(
+    @InjectRepository(UserEntity) private readonly usersRepository: Repository<UserEntity>,
+  ) {
     super();
   }
 
-  serializeUser(user: User, done: CallableFunction) {
+  serializeUser(user: UserEntity, done: CallableFunction) {
     done(null, user.id);
   }
 
