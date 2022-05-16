@@ -54,7 +54,7 @@ export class PostEntity {
     description: '속한 카테고리 id',
   })
   @ManyToOne(() => CategoryEntity, { onDelete: 'CASCADE' })
-  category: () => CategoryEntity;
+  category: CategoryEntity;
 
   @ApiProperty({
     example: '2022-05-13T22:26:44.438Z',

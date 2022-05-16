@@ -40,12 +40,9 @@ export class UsersService {
   }
 
   async getUserById(id: number): Promise<UserResponseDto> {
-    try {
-      const user = await this.usersRepository.findOneOrFail({ id });
-      return Utils.removePasswordFromUser(user);
-    } catch (err) {
-      throw new NotFoundException('유저를 찾을 수 없습니다.');
-    }
+    const user = await this.getUserByIdOr404(id);
+
+    return Utils.removePasswordFromUser(user);
   }
 
   async updateUserById(id: number, userUpdateDto: UserUpdateDto): Promise<UserResponseDto> {
@@ -78,10 +75,7 @@ export class UsersService {
     file: Express.Multer.File,
     id: number,
   ): Promise<UserResponseDto> {
-    const user = await this.usersRepository.findOne({ id });
-    if (!user) {
-      throw new NotFoundException('유저를 찾을 수 없습니다.');
-    }
+    const user = await this.getUserByIdOr404(id);
     if (!file) {
       user.profile_img = null;
     } else {
@@ -91,5 +85,13 @@ export class UsersService {
     const savedUser = await this.usersRepository.save(user);
 
     return Utils.removePasswordFromUser(savedUser);
+  }
+
+  private async getUserByIdOr404(id: number) {
+    const user = this.usersRepository.findOne({ id });
+    if (!user) {
+      throw new NotFoundException('유저가 존재하지 않습니다.');
+    }
+    return user;
   }
 }

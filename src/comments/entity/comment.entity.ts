@@ -43,7 +43,7 @@ export class CommentEntity {
     description: '댓글이 달린 게시물 id',
   })
   @ManyToOne(() => PostEntity, { onDelete: 'CASCADE' })
-  post: () => PostEntity;
+  post: PostEntity;
 
   @ApiProperty({
     example: '2022-05-13T22:26:44.438Z',
