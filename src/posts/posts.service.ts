@@ -7,11 +7,14 @@ import { UserEntity } from '../users/entity/user.entity';
 import { Utils } from '../common/utils';
 import { PostResponseDto } from './dto/post-response.dto';
 import { PostUpdateDto } from './dto/post-update.dto';
+import { CommentEntity } from '../comments/entity/comment.entity';
+import { CommentResponseDto } from '../comments/dto/comment-response.dto';
 
 @Injectable()
 export class PostsService {
   constructor(
     @InjectRepository(PostEntity) private readonly postsRepository: Repository<PostEntity>,
+    @InjectRepository(CommentEntity) private readonly commentsRepository: Repository<CommentEntity>,
   ) {}
 
   async createPost(user: UserEntity, postCreateDto: PostCreateDto): Promise<PostResponseDto> {
@@ -64,7 +67,15 @@ export class PostsService {
     await this.postsRepository.delete({ id });
   }
 
-  async getAllCommentsByPostId(id: number) {
-    // TODO: comment 완성하면 구현할 것
+  async getAllCommentsByPostId(id: number): Promise<CommentResponseDto[]> {
+    const post = await this.postsRepository.findOne({ where: { id } });
+    if (!post) {
+      throw new NotFoundException(`id ${id} 게시물을 찾을 수 없음`);
+    }
+    const comments = await this.commentsRepository.find({
+      where: { post: post },
+      relations: ['author'],
+    });
+    return comments.map((comment) => Utils.commentsEntityToCommentResponseDto(comment));
   }
 }

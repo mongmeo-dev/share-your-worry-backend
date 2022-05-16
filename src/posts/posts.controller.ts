@@ -26,6 +26,7 @@ import { CurrentUser } from '../common/decorator/current-user.decorator';
 import { UserEntity } from '../users/entity/user.entity';
 import { PostResponseDto } from './dto/post-response.dto';
 import { PostUpdateDto } from './dto/post-update.dto';
+import { CommentResponseDto } from '../comments/dto/comment-response.dto';
 
 @ApiTags('Post')
 @Controller('posts')
@@ -143,5 +144,28 @@ export class PostsController {
   ): Promise<string> {
     await this.postsService.deletePostById(id, user);
     return 'ok';
+  }
+
+  @ApiOperation({
+    summary: '특정 게시물에 달린 댓글 가져오기',
+  })
+  @ApiParam({
+    name: 'id',
+    example: 1,
+    description: '게시물 id',
+  })
+  @ApiOkResponse({
+    description: '게시물에 달린 모든 댓글 반환',
+    type: CommentResponseDto,
+    isArray: true,
+  })
+  @ApiNotFoundResponse({
+    description: '해당하는 id의 게시물을 찾을 수 없음',
+  })
+  @Get(':id/comments')
+  async getAllCommentsByPostId(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<CommentResponseDto[]> {
+    return await this.postsService.getAllCommentsByPostId(id);
   }
 }

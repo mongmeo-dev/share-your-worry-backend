@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { CategoriesModule } from './categories/categories.module';
 import { PostsModule } from './posts/posts.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { CommentsModule } from './comments/comments.module';
 import * as path from 'path';
 
 @Module({
@@ -30,6 +31,7 @@ import * as path from 'path';
     UsersModule,
     CategoriesModule,
     PostsModule,
+    CommentsModule,
   ],
   controllers: [],
   providers: [],
