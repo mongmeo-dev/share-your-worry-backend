@@ -1,5 +1,11 @@
 import { Controller, Get, Param, ParseIntPipe } from '@nestjs/common';
-import { ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import {
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiParam,
+  ApiTags,
+} from '@nestjs/swagger';
 import { CategoriesService } from './categories.service';
 import { CategoryEntity } from './entity/category.entity';
 import { PostEntity } from '../posts/entity/post.entity';
@@ -35,6 +41,9 @@ export class CategoriesController {
     description: '조회 성공',
     type: PostEntity,
     isArray: true,
+  })
+  @ApiNotFoundResponse({
+    description: '카테고리가 존재하지 않을시 에러',
   })
   @Get(':id/posts')
   async getAllPostsByCategoryId(@Param('id', ParseIntPipe) id: number): Promise<PostResponseDto[]> {

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CategoryEntity } from './entity/category.entity';
 import { Repository } from 'typeorm';
@@ -20,6 +20,11 @@ export class CategoriesService {
   }
 
   async getAllPostByCategoryId(id: number): Promise<PostResponseDto[]> {
+    const category = await this.categoriesRepository.findOne({ id });
+    if (!category) {
+      throw new NotFoundException('카테고리를 찾을 수 없음');
+    }
+
     const posts = await this.postsRepository.find({
       where: { category: id },
       relations: ['author'],
