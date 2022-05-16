@@ -8,12 +8,15 @@ import {
   Post,
   Put,
   Req,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { JoinDto } from './dto/join.dto';
 import {
   ApiBadRequestResponse,
+  ApiConsumes,
   ApiCreatedResponse,
   ApiForbiddenResponse,
   ApiOkResponse,
@@ -30,6 +33,16 @@ import { UserEntity } from './entity/user.entity';
 import { Request } from 'express';
 import { UserUpdateDto } from './dto/user-update.dto';
 import { PostResponseDto } from '../posts/dto/post-response.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import * as fs from 'fs';
+import { multerConfig } from '../config/multerConfig';
+import { ApiFile } from '../common/decorator/apiFile.decorator';
+
+try {
+  fs.readdirSync('uploads');
+} catch (error) {
+  fs.mkdirSync('uploads');
+}
 
 @ApiTags('Users')
 @Controller('users')
@@ -125,5 +138,27 @@ export class UsersController {
   @Get('id/posts')
   async getAllPostsByUserId(@Param('id', ParseIntPipe) id: number): Promise<PostResponseDto[]> {
     return this.usersService.getAllPostByUserId(id);
+  }
+
+  @ApiOperation({
+    summary: '로그인 된 유저 프로필 사진 업로드',
+  })
+  @ApiConsumes('multipart/form-data')
+  @ApiFile()
+  @ApiCreatedResponse({
+    description: '프로필 사진 업로드 성공',
+    type: UserResponseDto,
+  })
+  @ApiUnauthorizedResponse({
+    description: '로그인 되지 않은 상태에서 호출시 에러',
+  })
+  @UseGuards(IsLoggedInGuard)
+  @UseInterceptors(FileInterceptor('profile-img', multerConfig))
+  @Post('/profile-img')
+  async uploadCurrentUserProfileImage(
+    @UploadedFile() img: Express.Multer.File,
+    @CurrentUser() user: UserEntity,
+  ) {
+    return await this.usersService.uploadProfileImageByUserId(img, user.id);
   }
 }

@@ -7,6 +7,7 @@ import * as passport from 'passport';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { createClient } from 'redis';
 import * as createRedisStore from 'connect-redis';
+import * as path from 'path';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -19,6 +20,11 @@ async function bootstrap() {
   });
   redisClient.on('connect', () => {
     new Logger('REDIS').log('Connected to redis successfully');
+  });
+
+  app.enableCors({
+    origin: true,
+    credentials: true,
   });
 
   app.use(

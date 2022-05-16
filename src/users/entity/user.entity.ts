@@ -43,8 +43,8 @@ export class UserEntity {
   nickname: string;
 
   @ApiProperty({
-    example: 'http://imageurl.com/image',
-    description: '프로필 이미지 url',
+    example: 'uploads/image.jpg',
+    description: '프로필 이미지 경로',
   })
   @Column('varchar', { default: null, length: 100 })
   profile_img: string;

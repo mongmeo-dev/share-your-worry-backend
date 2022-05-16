@@ -73,4 +73,23 @@ export class UsersService {
 
     return posts.map((post) => Utils.postEntityToPostResponseDto(post));
   }
+
+  async uploadProfileImageByUserId(
+    file: Express.Multer.File,
+    id: number,
+  ): Promise<UserResponseDto> {
+    const user = await this.usersRepository.findOne({ id });
+    if (!user) {
+      throw new NotFoundException('유저를 찾을 수 없습니다.');
+    }
+    if (!file) {
+      user.profile_img = null;
+    } else {
+      user.profile_img = `images/${file.filename}`;
+    }
+
+    const savedUser = await this.usersRepository.save(user);
+
+    return Utils.removePasswordFromUser(savedUser);
+  }
 }
