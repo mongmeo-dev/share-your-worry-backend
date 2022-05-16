@@ -6,6 +6,7 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Put,
   UseGuards,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
@@ -103,11 +104,8 @@ export class PostsController {
   @ApiUnauthorizedResponse({
     description: '로그인 되지 않은 상태에서 호출시 에러',
   })
-  @ApiForbiddenResponse({
-    description: '로그인 되지 않은 상태에서 호출시 에러',
-  })
   @UseGuards(IsLoggedInGuard)
-  @Post(':id')
+  @Put(':id')
   async updatePostById(
     @Param('id', ParseIntPipe) id: number,
     @CurrentUser() user: UserEntity,
