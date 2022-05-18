@@ -184,7 +184,7 @@ export class PostsController {
   }
 
   @ApiOperation({
-    summary: '특정 게시물에 달린 댓글 가져오기',
+    summary: '특정 게시물에 달린 댓글 수 가져오기',
   })
   @ApiParam({
     name: 'id',
@@ -192,9 +192,43 @@ export class PostsController {
     description: '게시물 id',
   })
   @ApiOkResponse({
+    description: '특정 게시물에 달린 전체 댓글 수 반환',
+  })
+  @ApiNotFoundResponse({
+    description: '해당하는 id의 게시물을 찾을 수 없음',
+  })
+  @Get(':id/comments/count')
+  async getCommentsCountByPostId(@Param('id', ParseIntPipe) id: number): Promise<number> {
+    return await this.postsService.getCommentsCountByPostIdOrThrow404(id);
+  }
+
+  @ApiOperation({
+    summary: '특정 게시물에 달린 댓글 가져오기',
+  })
+  @ApiParam({
+    name: 'id',
+    example: 1,
+    description: '게시물 id',
+  })
+  @ApiQuery({
+    name: 'page',
+    example: 1,
+    description: '페이지 번호(0이거나 넘기지 않으면 전체 게시물 반환, 기본값은 0)',
+    required: false,
+  })
+  @ApiQuery({
+    name: 'item-size',
+    example: 10,
+    description: '한 페이지에 보여줄 댓글 수(0이거나 넘기지 않으면 전체 게시물 반환, 기본값은 0)',
+    required: false,
+  })
+  @ApiOkResponse({
     description: '게시물에 달린 모든 댓글 반환',
     type: CommentResponseDto,
     isArray: true,
+  })
+  @ApiBadRequestResponse({
+    description: 'Query param 검증 오류',
   })
   @ApiNotFoundResponse({
     description: '해당하는 id의 게시물을 찾을 수 없음',
@@ -202,7 +236,9 @@ export class PostsController {
   @Get(':id/comments')
   async getAllCommentsByPostId(
     @Param('id', ParseIntPipe) id: number,
+    @Query('page', ParseIntOrNullPipe) page = 0,
+    @Query('item-size', ParseIntOrNullPipe) itemSize = 0,
   ): Promise<CommentResponseDto[]> {
-    return await this.postsService.getAllCommentsByPostId(id);
+    return await this.postsService.getAllCommentsByPostId(id, page, itemSize);
   }
 }

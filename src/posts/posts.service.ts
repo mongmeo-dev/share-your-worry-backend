@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PostEntity } from './entity/post.entity';
-import { Repository } from 'typeorm';
+import { getConnection, Repository } from 'typeorm';
 import { PostCreateDto } from './dto/post-create.dto';
 import { UserEntity } from '../users/entity/user.entity';
 import { Utils } from '../common/utils';
@@ -86,14 +86,28 @@ export class PostsService {
     await this.postsRepository.delete({ id });
   }
 
-  async getAllCommentsByPostId(id: number): Promise<CommentResponseDto[]> {
-    const post = await this.getPostByIdOrThrow404(id);
+  async getAllCommentsByPostId(
+    id: number,
+    page: number,
+    itemSize: number,
+  ): Promise<CommentResponseDto[]> {
+    if (page === 0 || itemSize === 0) {
+      page = 0;
+      itemSize = await this.getCommentsCountByPostIdOrThrow404(id);
+    }
 
     const comments = await this.commentsRepository.find({
-      where: { post: post },
+      where: { post: id },
       relations: ['author'],
+      skip: (page - 1) * itemSize,
+      take: itemSize,
     });
     return comments.map((comment) => Utils.commentsEntityToCommentResponseDto(comment));
+  }
+
+  async getCommentsCountByPostIdOrThrow404(id: number) {
+    await this.getPostByIdOrThrow404(id);
+    return await this.commentsRepository.count({ where: { post: id } });
   }
 
   private async validateCategory(id: CategoryEntity) {
