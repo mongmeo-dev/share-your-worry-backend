@@ -14,3 +14,7 @@
 - MySQL
 - Redis (Session 저장용)
 - TypeORM
+
+### ERD
+
+- https://dbdiagram.io/d/627d71ef7f945876b60bef75
