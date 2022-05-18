@@ -7,6 +7,7 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
@@ -20,6 +21,7 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiParam,
+  ApiQuery,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
@@ -29,6 +31,7 @@ import { UserEntity } from '../users/entity/user.entity';
 import { PostResponseDto } from './dto/post-response.dto';
 import { PostUpdateDto } from './dto/post-update.dto';
 import { CommentResponseDto } from '../comments/dto/comment-response.dto';
+import { ParseIntOrNullPipe } from '../common/pipe/parse-int-or-null.pipe';
 
 @ApiTags('Post')
 @Controller('posts')
@@ -58,16 +61,45 @@ export class PostsController {
   }
 
   @ApiOperation({
+    summary: '전체 게시물 수 가져오기',
+  })
+  @ApiOkResponse({
+    description: '전체 게시물 수 반환',
+  })
+  @Get('/count')
+  async getAllPostsCount(): Promise<number> {
+    return await this.postsService.getAllPostsCount();
+  }
+
+  @ApiOperation({
     summary: '전체 게시물 가져오기',
+  })
+  @ApiQuery({
+    name: 'page',
+    example: 1,
+    description: '페이지 번호(0이거나 넘기지 않으면 전체 게시물 반환, 기본값은 0)',
+    required: false,
+  })
+  @ApiQuery({
+    name: 'item-size',
+    example: 10,
+    description: '한 페이지에 보여줄 게시물 수(0이거나 넘기지 않으면 전체 게시물 반환, 기본값은 0)',
+    required: false,
   })
   @ApiOkResponse({
     description: '전체 게시물 반환',
     type: PostResponseDto,
     isArray: true,
   })
+  @ApiBadRequestResponse({
+    description: 'Query param 검증 오류',
+  })
   @Get()
-  async getAllPosts(): Promise<PostResponseDto[]> {
-    return await this.postsService.getAllPosts();
+  async getAllPosts(
+    @Query('page', ParseIntOrNullPipe) page = 0,
+    @Query('item-size', ParseIntOrNullPipe) itemSize = 0,
+  ): Promise<PostResponseDto[]> {
+    return await this.postsService.getAllPosts(page, itemSize);
   }
 
   @ApiOperation({

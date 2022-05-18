@@ -38,8 +38,21 @@ export class PostsService {
     return { ...savedPost, author: Utils.removePasswordFromUser(loggedInUser) };
   }
 
-  async getAllPosts(): Promise<PostResponseDto[]> {
-    const posts = await this.postsRepository.find({ relations: ['author', 'category'] });
+  async getAllPostsCount(): Promise<number> {
+    return await this.postsRepository.count();
+  }
+
+  async getAllPosts(page, itemSize): Promise<PostResponseDto[]> {
+    if (page === 0 || itemSize === 0) {
+      page = 0;
+      itemSize = await this.getAllPostsCount();
+    }
+
+    const posts = await this.postsRepository.find({
+      relations: ['author', 'category'],
+      skip: (page - 1) * itemSize,
+      take: itemSize,
+    });
 
     return posts.map((post) => Utils.postEntityToPostResponseDto(post));
   }
