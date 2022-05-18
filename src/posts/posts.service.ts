@@ -29,7 +29,7 @@ export class PostsService {
     loggedInUser: UserEntity,
     postCreateDto: PostCreateDto,
   ): Promise<PostResponseDto> {
-    await this.validateCategory(postCreateDto.category);
+    await this.validateCategoryId(postCreateDto.category.id);
 
     const newPost = await this.postsRepository.create(postCreateDto);
     newPost.author = loggedInUser;
@@ -78,7 +78,7 @@ export class PostsService {
 
     this.isAuthor(loggedInUser, post);
 
-    await this.validateCategory(postUpdateDto.category);
+    await this.validateCategoryId(postUpdateDto.category.id);
 
     const updatedPost = { ...post, ...postUpdateDto };
     const savedPost = await this.postsRepository.save(updatedPost);
@@ -134,8 +134,8 @@ export class PostsService {
     }
   }
 
-  private async validateCategory(condition: CategoryEntity) {
-    const isExist = await this.categoriesRepository.findOne({ where: { id: condition } });
+  private async validateCategoryId(id: number) {
+    const isExist = await this.categoriesRepository.findOne({ id });
 
     if (!isExist) {
       throw new BadRequestException('카테고리가 존재하지 않습니다.');
