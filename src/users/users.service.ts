@@ -29,24 +29,12 @@ export class UsersService {
     return Utils.removePasswordFromUser(newUser);
   }
 
-  private async checkEmailAndNicknameOverlap(email: string, nickname: string): Promise<void> {
-    const existUser = await this.usersRepository.findOne({ where: [{ email }, { nickname }] });
-    if (existUser && existUser.email === email) {
-      throw new BadRequestException('이 이메일은 이미 사용중입니다.');
-    }
-    if (existUser && existUser.nickname === nickname) {
-      throw new BadRequestException('이 닉네임은 이미 사용중입니다.');
-    }
-  }
-
-  async getUserById(id: number): Promise<UserResponseDto> {
-    const user = await this.getUserByIdOr404(id);
-
+  async getCurrentUserInfo(user: UserEntity) {
     return Utils.removePasswordFromUser(user);
   }
 
   async updateUserById(id: number, userUpdateDto: UserUpdateDto): Promise<UserResponseDto> {
-    const user = await this.getUserById(id);
+    const user = await this.getUserByIdOr404(id);
 
     if (userUpdateDto.nickname) {
       await this.checkEmailAndNicknameOverlap(null, userUpdateDto.nickname);
@@ -64,7 +52,7 @@ export class UsersService {
 
   async getAllPostByUserId(id: number): Promise<PostResponseDto[]> {
     const posts = await this.postsRepository.find({
-      where: { id },
+      where: { author: id },
       relations: ['author', 'category'],
     });
 
@@ -85,6 +73,16 @@ export class UsersService {
     const savedUser = await this.usersRepository.save(user);
 
     return Utils.removePasswordFromUser(savedUser);
+  }
+
+  private async checkEmailAndNicknameOverlap(email: string, nickname: string): Promise<void> {
+    const existUser = await this.usersRepository.findOne({ where: [{ email }, { nickname }] });
+    if (existUser && existUser.email === email) {
+      throw new BadRequestException('이 이메일은 이미 사용중입니다.');
+    }
+    if (existUser && existUser.nickname === nickname) {
+      throw new BadRequestException('이 닉네임은 이미 사용중입니다.');
+    }
   }
 
   private async getUserByIdOr404(id: number) {

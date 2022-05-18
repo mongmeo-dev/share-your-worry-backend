@@ -81,7 +81,7 @@ export class UsersController {
   @UseGuards(IsLoggedInGuard)
   @Get()
   async getCurrentUserInfo(@CurrentUser() user: UserEntity): Promise<UserResponseDto> {
-    return await this.usersService.getUserById(user.id);
+    return await this.usersService.getCurrentUserInfo(user);
   }
 
   @ApiOperation({
@@ -135,7 +135,7 @@ export class UsersController {
     type: PostResponseDto,
     isArray: true,
   })
-  @Get('id/posts')
+  @Get(':id/posts')
   async getAllPostsByUserId(@Param('id', ParseIntPipe) id: number): Promise<PostResponseDto[]> {
     return this.usersService.getAllPostByUserId(id);
   }
