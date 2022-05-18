@@ -31,7 +31,7 @@ import { UserEntity } from '../users/entity/user.entity';
 import { PostResponseDto } from './dto/post-response.dto';
 import { PostUpdateDto } from './dto/post-update.dto';
 import { CommentResponseDto } from '../comments/dto/comment-response.dto';
-import { ParseIntOrNullPipe } from '../common/pipe/parse-int-or-null.pipe';
+import { ParseIntOrUndefinedPipe } from '../common/pipe/parse-int-or-undefined-pipe.service';
 
 @ApiTags('Post')
 @Controller('posts')
@@ -96,8 +96,8 @@ export class PostsController {
   })
   @Get()
   async getAllPosts(
-    @Query('page', ParseIntOrNullPipe) page = 0,
-    @Query('item-size', ParseIntOrNullPipe) itemSize = 0,
+    @Query('page', ParseIntOrUndefinedPipe) page = 0,
+    @Query('item-size', ParseIntOrUndefinedPipe) itemSize = 0,
   ): Promise<PostResponseDto[]> {
     return await this.postsService.getAllPosts(page, itemSize);
   }
@@ -111,7 +111,7 @@ export class PostsController {
     description: '게시물 id',
   })
   @ApiOkResponse({
-    description: '전체 게시물 반환',
+    description: '해당 게시물 반환',
     type: PostResponseDto,
   })
   @ApiNotFoundResponse({
@@ -236,8 +236,8 @@ export class PostsController {
   @Get(':id/comments')
   async getAllCommentsByPostId(
     @Param('id', ParseIntPipe) id: number,
-    @Query('page', ParseIntOrNullPipe) page = 0,
-    @Query('item-size', ParseIntOrNullPipe) itemSize = 0,
+    @Query('page', ParseIntOrUndefinedPipe) page = 0,
+    @Query('item-size', ParseIntOrUndefinedPipe) itemSize = 0,
   ): Promise<CommentResponseDto[]> {
     return await this.postsService.getAllCommentsByPostId(id, page, itemSize);
   }

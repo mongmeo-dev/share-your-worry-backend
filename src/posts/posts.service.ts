@@ -35,7 +35,7 @@ export class PostsService {
     newPost.author = loggedInUser;
     const savedPost = await this.postsRepository.save(newPost);
 
-    return { ...savedPost, author: Utils.removePasswordFromUser(loggedInUser) };
+    return Utils.postEntityToPostResponseDto(savedPost);
   }
 
   async getAllPostsCount(): Promise<number> {
@@ -43,16 +43,23 @@ export class PostsService {
   }
 
   async getAllPosts(page, itemSize): Promise<PostResponseDto[]> {
-    if (page === 0 || itemSize === 0) {
-      page = 0;
-      itemSize = await this.getAllPostsCount();
-    }
+    const postsQuery = getConnection()
+      .createQueryBuilder(PostEntity, 'post')
+      .leftJoinAndSelect('post.author', 'author')
+      .leftJoinAndSelect('post.category', 'category');
 
-    const posts = await this.postsRepository.find({
-      relations: ['author', 'category'],
-      skip: (page - 1) * itemSize,
-      take: itemSize,
-    });
+    let posts: PostEntity[];
+
+    if (page === 0 || itemSize === 0) {
+      posts = await postsQuery.getMany();
+    } else if (page > 0 && itemSize > 0) {
+      posts = await postsQuery
+        .skip((page - 1) * itemSize)
+        .take(itemSize)
+        .getMany();
+    } else {
+      throw new BadRequestException('쿼리 파라미터는 양수 또는 0이어야 합니다.');
+    }
 
     return posts.map((post) => Utils.postEntityToPostResponseDto(post));
   }
@@ -91,37 +98,62 @@ export class PostsService {
     page: number,
     itemSize: number,
   ): Promise<CommentResponseDto[]> {
+    await this.validatePostId(id);
+
+    const commentsQuery = getConnection()
+      .createQueryBuilder(CommentEntity, 'comment')
+      .leftJoinAndSelect('comment.author', 'author')
+      .where('comment.post = :id', { id });
+
+    let comments: CommentEntity[];
+
     if (page === 0 || itemSize === 0) {
-      page = 0;
-      itemSize = await this.getCommentsCountByPostIdOrThrow404(id);
+      comments = await commentsQuery.getMany();
+    } else if (page > 0 && itemSize > 0) {
+      comments = await commentsQuery
+        .skip((page - 1) * itemSize)
+        .take(itemSize)
+        .getMany();
+    } else {
+      throw new BadRequestException('쿼리 파라미터는 양수 또는 0이어야 합니다.');
     }
 
-    const comments = await this.commentsRepository.find({
-      where: { post: id },
-      relations: ['author'],
-      skip: (page - 1) * itemSize,
-      take: itemSize,
-    });
     return comments.map((comment) => Utils.commentsEntityToCommentResponseDto(comment));
   }
 
   async getCommentsCountByPostIdOrThrow404(id: number) {
-    await this.getPostByIdOrThrow404(id);
+    await this.validatePostId(id);
     return await this.commentsRepository.count({ where: { post: id } });
   }
 
-  private async validateCategory(id: CategoryEntity) {
-    const category = await this.categoriesRepository.findOne({ where: { id } });
-    if (!category) {
+  private async validatePostId(id) {
+    const isExist = await this.postsRepository.findOne({ id });
+
+    if (!isExist) {
+      throw new NotFoundException('게시물이 존재하지 않습니다.');
+    }
+  }
+
+  private async validateCategory(condition: CategoryEntity) {
+    const isExist = await this.categoriesRepository.findOne({ where: { id: condition } });
+
+    if (!isExist) {
       throw new BadRequestException('카테고리가 존재하지 않습니다.');
     }
   }
 
-  private async getPostByIdOrThrow404(id: number) {
-    const post = await this.postsRepository.findOne({ where: { id }, relations: ['author'] });
+  private async getPostByIdOrThrow404(id: number): Promise<PostEntity> {
+    const post: PostEntity = await getConnection()
+      .createQueryBuilder(PostEntity, 'post')
+      .innerJoinAndSelect('post.author', 'author')
+      .innerJoinAndSelect('post.category', 'category')
+      .where('post.id = :id', { id })
+      .getOne();
+
     if (!post) {
-      throw new NotFoundException(`id ${id} 게시물을 찾을 수 없음`);
+      throw new NotFoundException('게시물이 존재하지 않습니다.');
     }
+
     return post;
   }
 

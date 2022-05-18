@@ -1,7 +1,7 @@
 import { ArgumentMetadata, BadRequestException, Injectable, PipeTransform } from '@nestjs/common';
 
 @Injectable()
-export class ParseIntOrNullPipe implements PipeTransform {
+export class ParseIntOrUndefinedPipe implements PipeTransform {
   transform(value: any, metadata: ArgumentMetadata): number | null {
     const valueToNumber = parseInt(value);
 
@@ -9,6 +9,6 @@ export class ParseIntOrNullPipe implements PipeTransform {
       throw new BadRequestException('숫자만 입력할 수 있습니다.');
     }
 
-    return value ? valueToNumber : null;
+    return value ? valueToNumber : undefined;
   }
 }
