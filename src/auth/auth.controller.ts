@@ -13,6 +13,7 @@ import { UserResponseDto } from '../users/dto/user-response.dto';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './local-auth-guard';
 import { IsNotLoggedInGuard } from './guard/is-not-logged-in.guard';
+import { IsLoggedInGuard } from './guard/is-logged-in.guard';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -48,9 +49,11 @@ export class AuthController {
   @ApiOkResponse({
     description: '로그아웃 성공',
   })
-  @ApiForbiddenResponse({
+  @ApiUnauthorizedResponse({
     description: '로그인 되지 않은 상태에서 호출시 에러',
   })
+  @UseGuards(IsLoggedInGuard)
+  @HttpCode(200)
   @Post('logout')
   logout(@Req() request: Request) {
     return this.authService.logout(request);
