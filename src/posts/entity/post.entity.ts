@@ -3,7 +3,6 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -12,7 +11,6 @@ import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
 import { CategoryEntity } from '../../categories/entity/category.entity';
 import { UserEntity } from '../../users/entity/user.entity';
 import { UserResponseDto } from '../../users/dto/user-response.dto';
-import { CommentEntity } from '../../comments/entity/comment.entity';
 
 @Entity({ name: 'post' })
 export class PostEntity {
@@ -44,14 +42,14 @@ export class PostEntity {
 
   @ApiProperty({
     type: UserResponseDto,
-    description: '작성자 id',
+    description: '작성자 객체',
   })
   @ManyToOne(() => UserEntity, { onDelete: 'CASCADE' })
   author: UserEntity;
 
   @ApiProperty({
-    example: 1,
-    description: '속한 카테고리 id',
+    type: CategoryEntity,
+    description: '속한 카테고리 객체',
   })
   @ManyToOne(() => CategoryEntity, { onDelete: 'CASCADE' })
   category: CategoryEntity;
