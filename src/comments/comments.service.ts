@@ -1,7 +1,7 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CommentEntity } from './entity/comment.entity';
-import { Repository } from 'typeorm';
+import { getConnection, Repository } from 'typeorm';
 import { UserEntity } from '../users/entity/user.entity';
 import { PostEntity } from '../posts/entity/post.entity';
 import { Utils } from '../common/utils';
@@ -53,7 +53,11 @@ export class CommentsService {
   }
 
   private async getCommentWithAuthorByIdOrThrow404(id: number): Promise<CommentEntity> {
-    const comment = await this.commentsRepository.findOne({ where: { id }, relations: ['author'] });
+    const comment = await getConnection()
+      .createQueryBuilder(CommentEntity, 'comment')
+      .leftJoinAndSelect('comment.author', 'author')
+      .where('comment.id = :id', { id })
+      .getOne();
     if (!comment) {
       throw new NotFoundException('댓글을 찾을 수 없음');
     }

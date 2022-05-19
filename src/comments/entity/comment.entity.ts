@@ -33,7 +33,7 @@ export class CommentEntity {
 
   @ApiProperty({
     type: UserResponseDto,
-    description: '작성자 id',
+    description: '작성자 객체',
   })
   @ManyToOne(() => UserEntity, { onDelete: 'CASCADE' })
   author: UserEntity;

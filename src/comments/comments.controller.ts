@@ -12,6 +12,7 @@ import { CommentsService } from './comments.service';
 import { CommentCreateDto } from './dto/comment-create.dto';
 import { CurrentUser } from '../common/decorator/current-user.decorator';
 import {
+  ApiBody,
   ApiCreatedResponse,
   ApiForbiddenResponse,
   ApiNotFoundResponse,
@@ -23,6 +24,7 @@ import {
 } from '@nestjs/swagger';
 import { IsLoggedInGuard } from '../auth/guard/is-logged-in.guard';
 import { CommentResponseDto } from './dto/comment-response.dto';
+import { CommentUpdateDto } from './dto/comment-update.dto';
 
 @ApiTags('Comment')
 @Controller('comments')
@@ -50,6 +52,9 @@ export class CommentsController {
 
   @ApiOperation({
     summary: '댓글 수정하기',
+  })
+  @ApiBody({
+    type: CommentUpdateDto,
   })
   @ApiParam({
     name: 'id',
