@@ -10,6 +10,7 @@ import * as createRedisStore from 'connect-redis';
 import { ConfigService } from '@nestjs/config';
 import { HttpExceptionFilter } from './common/filter/http-exception.filter';
 import { ResponseInterceptor } from './common/interceptor/response.interceptor';
+import { LoggingInterceptor } from './common/interceptor/logging.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -52,6 +53,7 @@ async function bootstrap() {
   app.use(passport.session());
 
   app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalInterceptors(new LoggingInterceptor());
   app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalInterceptors(new ResponseInterceptor());
 
