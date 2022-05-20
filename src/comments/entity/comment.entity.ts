@@ -35,14 +35,14 @@ export class CommentEntity {
     type: UserResponseDto,
     description: '작성자 객체',
   })
-  @ManyToOne(() => UserEntity, { onDelete: 'CASCADE' })
+  @ManyToOne(() => UserEntity, { onDelete: 'CASCADE', nullable: false })
   author: UserEntity;
 
   @ApiProperty({
     example: 1,
     description: '댓글이 달린 게시물 id',
   })
-  @ManyToOne(() => PostEntity, { onDelete: 'CASCADE' })
+  @ManyToOne(() => PostEntity, { onDelete: 'CASCADE', nullable: false })
   post: PostEntity;
 
   @ApiProperty({

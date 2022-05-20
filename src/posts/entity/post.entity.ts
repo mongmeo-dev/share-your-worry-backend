@@ -44,14 +44,14 @@ export class PostEntity {
     type: UserResponseDto,
     description: '작성자 객체',
   })
-  @ManyToOne(() => UserEntity, { onDelete: 'CASCADE' })
+  @ManyToOne(() => UserEntity, { onDelete: 'CASCADE', nullable: false })
   author: UserEntity;
 
   @ApiProperty({
     type: CategoryEntity,
     description: '속한 카테고리 객체',
   })
-  @ManyToOne(() => CategoryEntity, { onDelete: 'CASCADE' })
+  @ManyToOne(() => CategoryEntity, { onDelete: 'CASCADE', nullable: false })
   category: CategoryEntity;
 
   @ApiProperty({
