@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PostEntity } from './entity/post.entity';
-import { getConnection, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { PostCreateDto } from './dto/post-create.dto';
 import { UserEntity } from '../users/entity/user.entity';
 import { Utils } from '../common/utils';
@@ -43,8 +43,8 @@ export class PostsService {
   }
 
   async getAllPosts(page, itemSize): Promise<PostResponseDto[]> {
-    const postsQuery = getConnection()
-      .createQueryBuilder(PostEntity, 'post')
+    const postsQuery = this.postsRepository
+      .createQueryBuilder('post')
       .leftJoinAndSelect('post.author', 'author')
       .leftJoinAndSelect('post.category', 'category');
 
@@ -100,8 +100,8 @@ export class PostsService {
   ): Promise<CommentResponseDto[]> {
     await this.validatePostId(id);
 
-    const commentsQuery = getConnection()
-      .createQueryBuilder(CommentEntity, 'comment')
+    const commentsQuery = this.commentsRepository
+      .createQueryBuilder('comment')
       .leftJoinAndSelect('comment.author', 'author')
       .where('comment.post = :id', { id });
 
@@ -143,8 +143,8 @@ export class PostsService {
   }
 
   private async getPostByIdOrThrow404(id: number): Promise<PostEntity> {
-    const post: PostEntity = await getConnection()
-      .createQueryBuilder(PostEntity, 'post')
+    const post: PostEntity = await this.postsRepository
+      .createQueryBuilder('post')
       .innerJoinAndSelect('post.author', 'author')
       .innerJoinAndSelect('post.category', 'category')
       .where('post.id = :id', { id })

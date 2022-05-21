@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CategoryEntity } from './entity/category.entity';
-import { getConnection, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { PostEntity } from '../posts/entity/post.entity';
 import { PostResponseDto } from '../posts/dto/post-response.dto';
 import { Utils } from '../common/utils';
@@ -11,6 +11,8 @@ export class CategoriesService {
   constructor(
     @InjectRepository(CategoryEntity)
     private readonly categoriesRepository: Repository<CategoryEntity>,
+    @InjectRepository(PostEntity)
+    private readonly postRepository: Repository<PostEntity>,
   ) {}
 
   async getAllCategories(): Promise<CategoryEntity[]> {
@@ -24,8 +26,8 @@ export class CategoriesService {
   ): Promise<PostResponseDto[]> {
     await this.validateCategoryId(id);
 
-    const postsQuery = getConnection()
-      .createQueryBuilder(PostEntity, 'post')
+    const postsQuery = this.postRepository
+      .createQueryBuilder('post')
       .leftJoinAndSelect('post.author', 'author')
       .leftJoinAndSelect('post.category', 'category')
       .where('post.category = :id', { id });
