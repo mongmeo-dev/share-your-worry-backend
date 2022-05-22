@@ -6,4 +6,5 @@ export const mockPostsRepository = () => ({
     take: jest.fn().mockReturnThis(),
     getMany: jest.fn().mockReturnValue([]),
   }),
+  findOne: jest.fn(),
 });

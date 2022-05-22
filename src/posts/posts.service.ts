@@ -23,6 +23,7 @@ export class PostsService {
     @InjectRepository(CommentEntity) private readonly commentsRepository: Repository<CommentEntity>,
     @InjectRepository(CategoryEntity)
     private readonly categoriesRepository: Repository<CategoryEntity>,
+    private readonly utils: Utils,
   ) {}
 
   async createPost(
@@ -35,7 +36,7 @@ export class PostsService {
     newPost.author = loggedInUser;
     const savedPost = await this.postsRepository.save(newPost);
 
-    return Utils.postEntityToPostResponseDto(savedPost);
+    return this.utils.postEntityToPostResponseDto(savedPost);
   }
 
   async getAllPostsCount(): Promise<number> {
@@ -61,12 +62,12 @@ export class PostsService {
       throw new BadRequestException('쿼리 파라미터는 양수 또는 0이어야 합니다.');
     }
 
-    return posts.map((post) => Utils.postEntityToPostResponseDto(post));
+    return posts.map((post) => this.utils.postEntityToPostResponseDto(post));
   }
 
   async getPostById(id: number): Promise<PostResponseDto> {
     const post = await this.getPostByIdOrThrow404(id);
-    return Utils.postEntityToPostResponseDto(post);
+    return this.utils.postEntityToPostResponseDto(post);
   }
 
   async updatePostById(
@@ -82,7 +83,7 @@ export class PostsService {
 
     const updatedPost = { ...post, ...postUpdateDto };
     const savedPost = await this.postsRepository.save(updatedPost);
-    return Utils.postEntityToPostResponseDto(savedPost);
+    return this.utils.postEntityToPostResponseDto(savedPost);
   }
 
   async deletePostById(id: number, loggedInUser: UserEntity): Promise<void> {
@@ -118,7 +119,7 @@ export class PostsService {
       throw new BadRequestException('쿼리 파라미터는 양수 또는 0이어야 합니다.');
     }
 
-    return comments.map((comment) => Utils.commentsEntityToCommentResponseDto(comment));
+    return comments.map((comment) => this.utils.commentsEntityToCommentResponseDto(comment));
   }
 
   async getCommentsCountByPostIdOrThrow404(id: number) {

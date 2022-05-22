@@ -16,6 +16,7 @@ export class UsersService {
   constructor(
     @InjectRepository(UserEntity) private readonly usersRepository: Repository<UserEntity>,
     @InjectRepository(PostEntity) private readonly postsRepository: Repository<PostEntity>,
+    private readonly utils: Utils,
   ) {}
 
   async join(joinDto: JoinDto): Promise<UserResponseDto> {
@@ -26,11 +27,11 @@ export class UsersService {
 
     const newUser = await this.usersRepository.save(joinDto);
 
-    return Utils.removePasswordFromUser(newUser);
+    return this.utils.removePasswordFromUser(newUser);
   }
 
   async getCurrentUserInfo(user: UserEntity) {
-    return Utils.removePasswordFromUser(user);
+    return this.utils.removePasswordFromUser(user);
   }
 
   async updateUserById(id: number, userUpdateDto: UserUpdateDto): Promise<UserResponseDto> {
@@ -41,7 +42,7 @@ export class UsersService {
     }
 
     const updatedUser = await this.usersRepository.save({ ...user, ...userUpdateDto });
-    return Utils.removePasswordFromUser(updatedUser);
+    return this.utils.removePasswordFromUser(updatedUser);
   }
 
   async logoutAndDeleteUserById(request: Request, id: number): Promise<void> {
@@ -56,7 +57,7 @@ export class UsersService {
       relations: ['author', 'category'],
     });
 
-    return posts.map((post) => Utils.postEntityToPostResponseDto(post));
+    return posts.map((post) => this.utils.postEntityToPostResponseDto(post));
   }
 
   async uploadProfileImageByUserId(
@@ -72,7 +73,7 @@ export class UsersService {
 
     const savedUser = await this.usersRepository.save(user);
 
-    return Utils.removePasswordFromUser(savedUser);
+    return this.utils.removePasswordFromUser(savedUser);
   }
 
   private async checkEmailAndNicknameOverlap(email: string, nickname: string): Promise<void> {

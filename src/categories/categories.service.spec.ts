@@ -6,6 +6,8 @@ import { CategoryEntity } from './entity/category.entity';
 import { mockPostsRepository } from '../posts/mock/mock.posts.repository';
 import { PostEntity } from '../posts/entity/post.entity';
 import { NotFoundException } from '@nestjs/common';
+import { Utils } from '../common/utils';
+import { mockUtils } from '../common/mock/mock.utils';
 
 describe('CategoriesService', () => {
   let service: CategoriesService;
@@ -18,6 +20,7 @@ describe('CategoriesService', () => {
         CategoriesService,
         { provide: getRepositoryToken(CategoryEntity), useValue: mockCategoriesRepository() },
         { provide: getRepositoryToken(PostEntity), useValue: mockPostsRepository() },
+        { provide: Utils, useValue: mockUtils() },
       ],
     }).compile();
 

@@ -14,6 +14,7 @@ export class CommentsService {
   constructor(
     @InjectRepository(CommentEntity) private readonly commentsRepository: Repository<CommentEntity>,
     @InjectRepository(PostEntity) private readonly postsRepository: Repository<PostEntity>,
+    private readonly utils: Utils,
   ) {}
 
   async createComment(
@@ -28,7 +29,7 @@ export class CommentsService {
 
     const savedComment = await this.commentsRepository.save({ ...commentCreateDto, author });
 
-    return Utils.commentsEntityToCommentResponseDto(savedComment);
+    return this.utils.commentsEntityToCommentResponseDto(savedComment);
   }
 
   async updateComment(
@@ -40,7 +41,7 @@ export class CommentsService {
     this.isAuthor(loggedInUser, comment);
 
     const savedComment = await this.commentsRepository.save({ ...comment, ...commentUpdateDto });
-    return Utils.commentsEntityToCommentResponseDto(savedComment);
+    return this.utils.commentsEntityToCommentResponseDto(savedComment);
   }
 
   async deleteComment(id: number, loggedInUser: UserEntity): Promise<void> {

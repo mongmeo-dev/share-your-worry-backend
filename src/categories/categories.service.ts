@@ -13,6 +13,7 @@ export class CategoriesService {
     private readonly categoriesRepository: Repository<CategoryEntity>,
     @InjectRepository(PostEntity)
     private readonly postRepository: Repository<PostEntity>,
+    private readonly utils: Utils,
   ) {}
 
   async getAllCategories(): Promise<CategoryEntity[]> {
@@ -46,7 +47,7 @@ export class CategoriesService {
     }
 
     return posts.map((post) => {
-      return Utils.postEntityToPostResponseDto(post);
+      return this.utils.postEntityToPostResponseDto(post);
     });
   }
 
