@@ -116,7 +116,7 @@ export class PostsService {
         .take(itemSize)
         .getMany();
     } else {
-      throw new BadRequestException('쿼리 파라미터는 양수 또는 0이어야 합니다.');
+      throw new BadRequestException('페이지, 아이템 사이즈는 0 또는 양수여야 합니다.');
     }
 
     return comments.map((comment) => this.utils.commentsEntityToCommentResponseDto(comment));
@@ -131,7 +131,7 @@ export class PostsService {
     const isExist = await this.postsRepository.findOne({ id });
 
     if (!isExist) {
-      throw new NotFoundException('게시물이 존재하지 않습니다.');
+      throw new NotFoundException('게시물을 찾을 수 없습니다.');
     }
   }
 
@@ -139,7 +139,7 @@ export class PostsService {
     const isExist = await this.categoriesRepository.findOne({ id });
 
     if (!isExist) {
-      throw new BadRequestException('카테고리가 존재하지 않습니다.');
+      throw new BadRequestException('카테고리를 찾을 수 없습니다.');
     }
   }
 
@@ -152,7 +152,7 @@ export class PostsService {
       .getOne();
 
     if (!post) {
-      throw new NotFoundException('게시물이 존재하지 않습니다.');
+      throw new NotFoundException('게시물을 찾을 수 없습니다..');
     }
 
     return post;

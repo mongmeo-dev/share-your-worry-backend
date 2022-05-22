@@ -24,7 +24,7 @@ export class CommentsService {
     const targetPostId = commentCreateDto.post;
     const targetPost = await this.postsRepository.findOne({ where: { id: targetPostId } });
     if (!targetPost) {
-      throw new NotFoundException('포스트를 찾을 수 없음');
+      throw new NotFoundException('포스트를 찾을 수 없습니다.');
     }
 
     const savedComment = await this.commentsRepository.save({ ...commentCreateDto, author });
@@ -59,7 +59,7 @@ export class CommentsService {
       .where('comment.id = :id', { id })
       .getOne();
     if (!comment) {
-      throw new NotFoundException('댓글을 찾을 수 없음');
+      throw new NotFoundException('댓글을 찾을 수 없습니다.');
     }
     return comment;
   }

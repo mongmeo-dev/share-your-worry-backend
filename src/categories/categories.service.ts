@@ -43,7 +43,7 @@ export class CategoriesService {
         .take(itemSize)
         .getMany();
     } else {
-      throw new BadRequestException('쿼리 파라미터는 양수 또는 0이어야 합니다.');
+      throw new BadRequestException('페이지, 아이템 사이즈는 0 또는 양수여야 합니다.');
     }
 
     return posts.map((post) => {
@@ -54,7 +54,7 @@ export class CategoriesService {
   private async validateCategoryId(id: number) {
     const isExist = await this.categoriesRepository.findOne({ id });
     if (!isExist) {
-      throw new NotFoundException('카테고리를 찾을 수 없음');
+      throw new NotFoundException('카테고리를 찾을 수 없습니다.');
     }
   }
 }
