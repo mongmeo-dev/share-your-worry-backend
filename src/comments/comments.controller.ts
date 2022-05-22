@@ -25,6 +25,7 @@ import {
 import { IsLoggedInGuard } from '../auth/guard/is-logged-in.guard';
 import { CommentResponseDto } from './dto/comment-response.dto';
 import { CommentUpdateDto } from './dto/comment-update.dto';
+import { UserEntity } from '../users/entity/user.entity';
 
 @ApiTags('Comment')
 @Controller('comments')
@@ -48,7 +49,7 @@ export class CommentsController {
   @Post()
   async createComment(
     @Body() commentCreateDto: CommentCreateDto,
-    @CurrentUser() loggedInUser,
+    @CurrentUser() loggedInUser: UserEntity,
   ): Promise<CommentResponseDto> {
     return await this.commentsService.createComment(commentCreateDto, loggedInUser);
   }
@@ -81,8 +82,8 @@ export class CommentsController {
   @Put(':id')
   async updateComment(
     @Param('id', ParseIntPipe) id: number,
-    @Body() commentUpdateDto,
-    @CurrentUser() loggedInUser,
+    @Body() commentUpdateDto: CommentUpdateDto,
+    @CurrentUser() loggedInUser: UserEntity,
   ): Promise<CommentResponseDto> {
     return await this.commentsService.updateComment(id, commentUpdateDto, loggedInUser);
   }
@@ -111,7 +112,7 @@ export class CommentsController {
   @Delete(':id')
   async deleteComment(
     @Param('id', ParseIntPipe) id: number,
-    @CurrentUser() loggedInUser,
+    @CurrentUser() loggedInUser: UserEntity,
   ): Promise<void> {
     return await this.commentsService.deleteComment(id, loggedInUser);
   }
