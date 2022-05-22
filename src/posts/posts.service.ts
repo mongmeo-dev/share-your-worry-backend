@@ -19,8 +19,10 @@ import { CategoryEntity } from '../categories/entity/category.entity';
 @Injectable()
 export class PostsService {
   constructor(
-    @InjectRepository(PostEntity) private readonly postsRepository: Repository<PostEntity>,
-    @InjectRepository(CommentEntity) private readonly commentsRepository: Repository<CommentEntity>,
+    @InjectRepository(PostEntity)
+    private readonly postsRepository: Repository<PostEntity>,
+    @InjectRepository(CommentEntity)
+    private readonly commentsRepository: Repository<CommentEntity>,
     @InjectRepository(CategoryEntity)
     private readonly categoriesRepository: Repository<CategoryEntity>,
     private readonly utils: Utils,
@@ -32,9 +34,7 @@ export class PostsService {
   ): Promise<PostResponseDto> {
     await this.validateCategoryId(postCreateDto.category.id);
 
-    const newPost = await this.postsRepository.create(postCreateDto);
-    newPost.author = loggedInUser;
-    const savedPost = await this.postsRepository.save(newPost);
+    const savedPost = await this.postsRepository.save({ ...postCreateDto, author: loggedInUser });
 
     return this.utils.postEntityToPostResponseDto(savedPost);
   }
@@ -122,7 +122,7 @@ export class PostsService {
     return comments.map((comment) => this.utils.commentsEntityToCommentResponseDto(comment));
   }
 
-  async getCommentsCountByPostIdOrThrow404(id: number) {
+  async getCommentsCountByPostId(id: number) {
     await this.validatePostId(id);
     return await this.commentsRepository.count({ where: { post: id } });
   }

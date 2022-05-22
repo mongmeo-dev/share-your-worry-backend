@@ -199,7 +199,7 @@ export class PostsController {
   })
   @Get(':id/comments/count')
   async getCommentsCountByPostId(@Param('id', ParseIntPipe) id: number): Promise<number> {
-    return await this.postsService.getCommentsCountByPostIdOrThrow404(id);
+    return await this.postsService.getCommentsCountByPostId(id);
   }
 
   @ApiOperation({
