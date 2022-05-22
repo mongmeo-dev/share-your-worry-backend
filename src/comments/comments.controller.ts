@@ -46,7 +46,10 @@ export class CommentsController {
   })
   @UseGuards(IsLoggedInGuard)
   @Post()
-  async createComment(@Body() commentCreateDto: CommentCreateDto, @CurrentUser() loggedInUser) {
+  async createComment(
+    @Body() commentCreateDto: CommentCreateDto,
+    @CurrentUser() loggedInUser,
+  ): Promise<CommentResponseDto> {
     return await this.commentsService.createComment(commentCreateDto, loggedInUser);
   }
 
@@ -80,7 +83,7 @@ export class CommentsController {
     @Param('id', ParseIntPipe) id: number,
     @Body() commentUpdateDto,
     @CurrentUser() loggedInUser,
-  ) {
+  ): Promise<CommentResponseDto> {
     return await this.commentsService.updateComment(id, commentUpdateDto, loggedInUser);
   }
 
@@ -106,7 +109,10 @@ export class CommentsController {
   })
   @UseGuards(IsLoggedInGuard)
   @Delete(':id')
-  async deleteComment(@Param('id', ParseIntPipe) id: number, @CurrentUser() loggedInUser) {
+  async deleteComment(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() loggedInUser,
+  ): Promise<void> {
     return await this.commentsService.deleteComment(id, loggedInUser);
   }
 }

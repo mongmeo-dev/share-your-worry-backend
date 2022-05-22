@@ -26,8 +26,7 @@ export class CommentsService {
       throw new NotFoundException('포스트를 찾을 수 없음');
     }
 
-    const newComment = await this.commentsRepository.create({ ...commentCreateDto, author });
-    const savedComment = await this.commentsRepository.save(newComment);
+    const savedComment = await this.commentsRepository.save({ ...commentCreateDto, author });
 
     return Utils.commentsEntityToCommentResponseDto(savedComment);
   }
@@ -44,12 +43,12 @@ export class CommentsService {
     return Utils.commentsEntityToCommentResponseDto(savedComment);
   }
 
-  async deleteComment(id: number, loggedInUser: UserEntity): Promise<string> {
+  async deleteComment(id: number, loggedInUser: UserEntity): Promise<void> {
     const comment = await this.getCommentWithAuthorByIdOrThrow404(id);
+
     this.isAuthor(loggedInUser, comment);
 
     await this.commentsRepository.delete({ id: id });
-    return 'ok';
   }
 
   private async getCommentWithAuthorByIdOrThrow404(id: number): Promise<CommentEntity> {
