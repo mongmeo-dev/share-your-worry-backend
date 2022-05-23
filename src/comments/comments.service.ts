@@ -55,7 +55,7 @@ export class CommentsService {
   private async getCommentWithAuthorByIdOrThrow404(id: number): Promise<CommentEntity> {
     const comment = await this.commentsRepository
       .createQueryBuilder('comment')
-      .leftJoinAndSelect('comment.author', 'author')
+      .innerJoinAndSelect('comment.author', 'author')
       .where('comment.id = :id', { id })
       .getOne();
     if (!comment) {
