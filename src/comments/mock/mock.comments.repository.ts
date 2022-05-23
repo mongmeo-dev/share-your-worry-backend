@@ -4,6 +4,7 @@ export const mockCommentsRepository = () => ({
   count: jest.fn(),
   createQueryBuilder: jest.fn().mockReturnValue({
     leftJoinAndSelect: jest.fn().mockReturnThis(),
+    innerJoinAndSelect: jest.fn().mockReturnThis(),
     where: jest.fn().mockReturnThis(),
     skip: jest.fn().mockReturnThis(),
     take: jest.fn().mockReturnThis(),
