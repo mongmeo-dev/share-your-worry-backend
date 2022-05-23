@@ -54,10 +54,10 @@ export class PostsController {
   @UseGuards(IsLoggedInGuard)
   @Post()
   async createPost(
+    @CurrentUser() loggedInUser: UserEntity,
     @Body() postCreateDto: PostCreateDto,
-    @CurrentUser() user: UserEntity,
   ): Promise<PostResponseDto> {
-    return await this.postsService.createPost(user, postCreateDto);
+    return await this.postsService.createPost(loggedInUser, postCreateDto);
   }
 
   @ApiOperation({
@@ -147,10 +147,10 @@ export class PostsController {
   @Put(':id')
   async updatePostById(
     @Param('id', ParseIntPipe) id: number,
-    @CurrentUser() user: UserEntity,
+    @CurrentUser() loggedInUser: UserEntity,
     @Body() postUpdateDto: PostUpdateDto,
   ): Promise<PostResponseDto> {
-    return await this.postsService.updatePostById(id, user, postUpdateDto);
+    return await this.postsService.updatePostById(id, loggedInUser, postUpdateDto);
   }
 
   @ApiOperation({
@@ -177,9 +177,9 @@ export class PostsController {
   @Delete(':id')
   async deletePostById(
     @Param('id', ParseIntPipe) id: number,
-    @CurrentUser() user: UserEntity,
+    @CurrentUser() loggedInUser: UserEntity,
   ): Promise<string> {
-    await this.postsService.deletePostById(id, user);
+    await this.postsService.deletePostById(id, loggedInUser);
     return 'ok';
   }
 
