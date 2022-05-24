@@ -80,8 +80,8 @@ export class UsersController {
   })
   @UseGuards(IsLoggedInGuard)
   @Get()
-  async getCurrentUserInfo(@CurrentUser() user: UserEntity): Promise<UserResponseDto> {
-    return await this.usersService.getCurrentUserInfo(user);
+  async getCurrentUserInfo(@CurrentUser() loggedInUser: UserEntity): Promise<UserResponseDto> {
+    return await this.usersService.getCurrentUserInfo(loggedInUser);
   }
 
   @ApiOperation({
@@ -97,10 +97,10 @@ export class UsersController {
   @UseGuards(IsLoggedInGuard)
   @Put()
   async updateCurrentUser(
-    @CurrentUser() user: UserEntity,
+    @CurrentUser() loggedInUser: UserEntity,
     @Body() userUpdateDto: UserUpdateDto,
   ): Promise<UserResponseDto> {
-    return await this.usersService.updateUserById(user.id, userUpdateDto);
+    return await this.usersService.updateCurrentUser(loggedInUser, userUpdateDto);
   }
 
   @ApiOperation({
@@ -116,9 +116,9 @@ export class UsersController {
   @Delete()
   async deleteCurrentUser(
     @Req() request: Request,
-    @CurrentUser() user: UserEntity,
+    @CurrentUser() loggedInUser: UserEntity,
   ): Promise<string> {
-    await this.usersService.logoutAndDeleteUserById(request, user.id);
+    await this.usersService.logoutAndDeleteCurrentUser(request, loggedInUser);
     return 'ok';
   }
 
@@ -159,6 +159,6 @@ export class UsersController {
     @UploadedFile() img: Express.Multer.File,
     @CurrentUser() user: UserEntity,
   ) {
-    return await this.usersService.uploadProfileImageByUserId(img, user.id);
+    return await this.usersService.uploadCurrentUserProfileImage(img, user);
   }
 }

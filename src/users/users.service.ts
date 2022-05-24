@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entity/user.entity';
 import { Repository } from 'typeorm';
@@ -30,25 +30,26 @@ export class UsersService {
     return this.utils.removePasswordFromUser(newUser);
   }
 
-  async getCurrentUserInfo(user: UserEntity) {
-    return this.utils.removePasswordFromUser(user);
+  async getCurrentUserInfo(loggedInUser: UserEntity) {
+    return this.utils.removePasswordFromUser(loggedInUser);
   }
 
-  async updateUserById(id: number, userUpdateDto: UserUpdateDto): Promise<UserResponseDto> {
-    const user = await this.getUserByIdOr404(id);
-
+  async updateCurrentUser(
+    loggedInUser: UserEntity,
+    userUpdateDto: UserUpdateDto,
+  ): Promise<UserResponseDto> {
     if (userUpdateDto.nickname) {
+      // email 변경은 허용하지 않음
       await this.checkEmailAndNicknameOverlap(null, userUpdateDto.nickname);
     }
 
-    const updatedUser = await this.usersRepository.save({ ...user, ...userUpdateDto });
+    const updatedUser = await this.usersRepository.save({ ...loggedInUser, ...userUpdateDto });
     return this.utils.removePasswordFromUser(updatedUser);
   }
 
-  async logoutAndDeleteUserById(request: Request, id: number): Promise<void> {
+  async logoutAndDeleteCurrentUser(request: Request, loggedInUser: UserEntity): Promise<void> {
     request.logout();
-    request.session.cookie.maxAge = 0;
-    await this.usersRepository.delete({ id });
+    await this.usersRepository.delete({ id: loggedInUser.id });
   }
 
   async getAllPostByUserId(id: number): Promise<PostResponseDto[]> {
@@ -60,18 +61,17 @@ export class UsersService {
     return posts.map((post) => this.utils.postEntityToPostResponseDto(post));
   }
 
-  async uploadProfileImageByUserId(
+  async uploadCurrentUserProfileImage(
     file: Express.Multer.File,
-    id: number,
+    loggedInUser: UserEntity,
   ): Promise<UserResponseDto> {
-    const user = await this.getUserByIdOr404(id);
     if (!file) {
-      user.profile_img = null;
+      loggedInUser.profile_img = null;
     } else {
-      user.profile_img = `images/${file.filename}`;
+      loggedInUser.profile_img = `images/${file.filename}`;
     }
 
-    const savedUser = await this.usersRepository.save(user);
+    const savedUser = await this.usersRepository.save(loggedInUser);
 
     return this.utils.removePasswordFromUser(savedUser);
   }
@@ -84,13 +84,5 @@ export class UsersService {
     if (existUser && existUser.nickname === nickname) {
       throw new BadRequestException('이 닉네임은 이미 사용중입니다.');
     }
-  }
-
-  private async getUserByIdOr404(id: number) {
-    const user = this.usersRepository.findOne({ id });
-    if (!user) {
-      throw new NotFoundException('유저를 찾을 수 없습니다.');
-    }
-    return user;
   }
 }
