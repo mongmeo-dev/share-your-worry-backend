@@ -52,7 +52,7 @@ export class UsersService {
     await this.usersRepository.delete({ id: loggedInUser.id });
   }
 
-  async getAllPostByUserId(id: number): Promise<PostResponseDto[]> {
+  async getAllPostsByUserId(id: number): Promise<PostResponseDto[]> {
     await this.validateUserId(id);
 
     const posts = await this.postsRepository.find({

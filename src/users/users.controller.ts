@@ -118,9 +118,8 @@ export class UsersController {
   async deleteCurrentUser(
     @Req() request: Request,
     @CurrentUser() loggedInUser: UserEntity,
-  ): Promise<string> {
+  ): Promise<void> {
     await this.usersService.logoutAndDeleteCurrentUser(request, loggedInUser);
-    return 'ok';
   }
 
   @ApiOperation({
@@ -141,7 +140,7 @@ export class UsersController {
   })
   @Get(':id/posts')
   async getAllPostsByUserId(@Param('id', ParseIntPipe) id: number): Promise<PostResponseDto[]> {
-    return this.usersService.getAllPostByUserId(id);
+    return this.usersService.getAllPostsByUserId(id);
   }
 
   @ApiOperation({

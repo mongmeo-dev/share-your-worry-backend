@@ -12,4 +12,5 @@ export const mockPostsRepository = () => ({
   save: jest.fn(),
   count: jest.fn(),
   delete: jest.fn(),
+  find: jest.fn(),
 });
