@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entity/user.entity';
 import { Repository } from 'typeorm';
@@ -53,6 +53,8 @@ export class UsersService {
   }
 
   async getAllPostByUserId(id: number): Promise<PostResponseDto[]> {
+    await this.validateUserId(id);
+
     const posts = await this.postsRepository.find({
       where: { author: id },
       relations: ['author', 'category'],
@@ -83,6 +85,13 @@ export class UsersService {
     }
     if (existUser && existUser.nickname === nickname) {
       throw new BadRequestException('이 닉네임은 이미 사용중입니다.');
+    }
+  }
+
+  private async validateUserId(id: number) {
+    const user = await this.usersRepository.findOne({ id });
+    if (!user) {
+      throw new NotFoundException('사용자를 찾을 수 없습니다.');
     }
   }
 }

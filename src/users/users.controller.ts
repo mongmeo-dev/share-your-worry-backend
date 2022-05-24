@@ -19,6 +19,7 @@ import {
   ApiConsumes,
   ApiCreatedResponse,
   ApiForbiddenResponse,
+  ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
@@ -134,6 +135,9 @@ export class UsersController {
     description: '특정 유저가 작성한 모든 게시물 반환',
     type: PostResponseDto,
     isArray: true,
+  })
+  @ApiNotFoundResponse({
+    description: '유저를 찾을 수 없을시 에러',
   })
   @Get(':id/posts')
   async getAllPostsByUserId(@Param('id', ParseIntPipe) id: number): Promise<PostResponseDto[]> {
