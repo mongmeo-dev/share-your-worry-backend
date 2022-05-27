@@ -24,8 +24,7 @@ export class AuthService {
     return null;
   }
 
-  logout(request: Request): string {
+  logout(request: Request) {
     request.logout();
-    return '로그아웃 성공';
   }
 }

@@ -10,9 +10,11 @@ import {
 } from '@nestjs/swagger';
 import { CategoriesService } from './categories.service';
 import { CategoryEntity } from './entity/category.entity';
-import { PostEntity } from '../posts/entity/post.entity';
 import { PostResponseDto } from '../posts/dto/post-response.dto';
 import { ParseIntOrUndefinedPipe } from '../common/pipe/parse-int-or-undefined-pipe.service';
+import { CategoriesResponse } from './swagger/categories.response';
+import { ExceptionResponse } from '../common/swagger/exception.response';
+import { PostsResponse } from '../posts/swagger/posts.response';
 
 @ApiTags('Category')
 @Controller('categories')
@@ -24,7 +26,7 @@ export class CategoriesController {
   })
   @ApiOkResponse({
     description: '조회 성공',
-    type: CategoryEntity,
+    type: CategoriesResponse,
     isArray: true,
   })
   @Get()
@@ -54,14 +56,15 @@ export class CategoriesController {
   })
   @ApiOkResponse({
     description: '조회 성공',
-    type: PostEntity,
-    isArray: true,
+    type: PostsResponse,
   })
   @ApiBadRequestResponse({
     description: 'Query param 검증 오류',
+    type: ExceptionResponse,
   })
   @ApiNotFoundResponse({
     description: '카테고리가 존재하지 않을시 에러',
+    type: ExceptionResponse,
   })
   @Get(':id/posts')
   async getAllPostsByCategoryId(
