@@ -19,7 +19,7 @@ describe('CommentsService', () => {
   let postsRepository;
   let utils;
 
-  const author: UserEntity = { id: 1, email: '', password: '', profile_img: null, nickname: '' };
+  const author: UserEntity = { id: 1, email: '', password: '', profileImage: null, nickname: '' };
   const loggedInUser = new UserEntity();
   loggedInUser.id = 2;
   const comment = new CommentEntity();

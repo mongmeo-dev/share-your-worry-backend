@@ -23,7 +23,7 @@ describe('UsersService', () => {
     email: '',
     password: '',
     nickname: '',
-    profile_img: null,
+    profileImage: null,
   };
 
   beforeEach(async () => {

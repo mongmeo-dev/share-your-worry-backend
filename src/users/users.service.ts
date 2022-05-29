@@ -10,12 +10,20 @@ import { Utils } from '../common/utils';
 import { UserUpdateDto } from './dto/user-update.dto';
 import { PostResponseDto } from '../posts/dto/post-response.dto';
 import { PostEntity } from '../posts/entity/post.entity';
+import { EmailVerificationEntity } from './entity/email-verification.entity';
+import { v4 as uuid } from 'uuid';
+import { EmailsService } from '../emails/emails.service';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(UserEntity) private readonly usersRepository: Repository<UserEntity>,
-    @InjectRepository(PostEntity) private readonly postsRepository: Repository<PostEntity>,
+    @InjectRepository(UserEntity)
+    private readonly usersRepository: Repository<UserEntity>,
+    @InjectRepository(PostEntity)
+    private readonly postsRepository: Repository<PostEntity>,
+    @InjectRepository(EmailVerificationEntity)
+    private readonly emailVerificationsRepository: Repository<EmailVerificationEntity>,
+    private readonly emailsService: EmailsService,
     private readonly utils: Utils,
   ) {}
 
@@ -26,6 +34,8 @@ export class UsersService {
     joinDto.password = hashedPassword;
 
     const newUser = await this.usersRepository.save(joinDto);
+
+    await this.sendVerificationEmail(newUser);
 
     return this.utils.removePasswordFromUser(newUser);
   }
@@ -68,14 +78,32 @@ export class UsersService {
     loggedInUser: UserEntity,
   ): Promise<UserResponseDto> {
     if (!file) {
-      loggedInUser.profile_img = null;
+      loggedInUser.profileImage = null;
     } else {
-      loggedInUser.profile_img = `images/${file.filename}`;
+      loggedInUser.profileImage = `images/${file.filename}`;
     }
 
     const savedUser = await this.usersRepository.save(loggedInUser);
 
     return this.utils.removePasswordFromUser(savedUser);
+  }
+
+  async verifyEmail(verificationCode: string): Promise<void> {
+    const emailVerificationEntity = await this.emailVerificationsRepository.findOne({
+      where: { verificationCode },
+      relations: ['user'],
+    });
+
+    console.log(emailVerificationEntity);
+
+    if (emailVerificationEntity.expire_at < new Date()) {
+      await this.sendVerificationEmail(emailVerificationEntity.user);
+      throw new BadRequestException('유효기간이 경과했습니다. 다시 시도해주세요.');
+    }
+
+    emailVerificationEntity.user.emailVerified = true;
+    await this.usersRepository.save(emailVerificationEntity.user);
+    await this.emailVerificationsRepository.delete(emailVerificationEntity);
   }
 
   private async checkEmailAndNicknameOverlap(email: string, nickname: string): Promise<void> {
@@ -93,5 +121,27 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException('사용자를 찾을 수 없습니다.');
     }
+  }
+
+  private async createOrUpdateVerificationEntity(
+    user: UserEntity,
+  ): Promise<EmailVerificationEntity> {
+    let entity = await this.emailVerificationsRepository.findOne({ where: { user } });
+    console.log(entity);
+    if (!entity) {
+      console.log('들어옴!');
+      entity = new EmailVerificationEntity();
+      entity.user = user;
+      console.log(entity);
+    }
+    entity.verificationCode = uuid();
+    entity.expire_at = entity.initExpireDate();
+
+    return await this.emailVerificationsRepository.save(entity);
+  }
+
+  private async sendVerificationEmail(user: UserEntity) {
+    const emailVerificationEntity = await this.createOrUpdateVerificationEntity(user);
+    await this.emailsService.sendVerifyEmail(user, emailVerificationEntity);
   }
 }

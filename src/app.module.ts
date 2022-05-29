@@ -7,6 +7,7 @@ import { CategoriesModule } from './categories/categories.module';
 import { PostsModule } from './posts/posts.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { CommentsModule } from './comments/comments.module';
+import { EmailsModule } from './emails/emails.module';
 import * as path from 'path';
 
 @Module({
@@ -36,6 +37,7 @@ import * as path from 'path';
     CategoriesModule,
     PostsModule,
     CommentsModule,
+    EmailsModule,
   ],
   controllers: [],
   providers: [],

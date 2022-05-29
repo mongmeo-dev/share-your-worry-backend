@@ -7,6 +7,7 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  Query,
   Req,
   UploadedFile,
   UseGuards,
@@ -174,5 +175,10 @@ export class UsersController {
     @CurrentUser() user: UserEntity,
   ) {
     return await this.usersService.uploadCurrentUserProfileImage(img, user);
+  }
+
+  @Post('email-verify')
+  async verifyEmail(@Query('verificationCode') code: string): Promise<void> {
+    await this.usersService.verifyEmail(code);
   }
 }

@@ -46,6 +46,13 @@ export class UserEntity {
     example: 'uploads/image.jpg',
     description: '프로필 이미지 경로',
   })
-  @Column('varchar', { default: null, length: 100 })
-  profile_img: string;
+  @Column('varchar', { name: 'profile_image', default: null, length: 100 })
+  profileImage: string;
+
+  @ApiProperty({
+    example: true,
+    description: '이메일 인증 여부',
+  })
+  @Column({ name: 'email_verified', default: false })
+  emailVerified: boolean;
 }
