@@ -17,6 +17,7 @@ describe('UsersController', () => {
     password: '',
     nickname: '',
     profileImage: null,
+    emailVerified: true,
   };
 
   beforeEach(async () => {

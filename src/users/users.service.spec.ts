@@ -11,6 +11,10 @@ import { JoinDto } from './dto/join.dto';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import * as httpMocks from 'node-mocks-http';
 import { UserUpdateDto } from './dto/user-update.dto';
+import { EmailVerificationEntity } from './entity/email-verification.entity';
+import { mockEmailVerificationsRepository } from '../emails/mock/mock.email-verifications.repository';
+import { EmailsService } from '../emails/emails.service';
+import { mockEmailsService } from '../emails/mock/mock-emails.service';
 
 describe('UsersService', () => {
   let service: UsersService;
@@ -24,14 +28,20 @@ describe('UsersService', () => {
     password: '',
     nickname: '',
     profileImage: null,
+    emailVerified: true,
   };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         UsersService,
+        { provide: EmailsService, useValue: mockEmailsService() },
         { provide: getRepositoryToken(UserEntity), useValue: mockUsersRepository() },
         { provide: getRepositoryToken(PostEntity), useValue: mockPostsRepository() },
+        {
+          provide: getRepositoryToken(EmailVerificationEntity),
+          useValue: mockEmailVerificationsRepository(),
+        },
         { provide: Utils, useValue: mockUtils() },
       ],
     }).compile();

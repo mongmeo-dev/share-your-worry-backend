@@ -28,6 +28,7 @@ describe('PostsService', () => {
     password: '',
     nickname: '',
     profileImage: null,
+    emailVerified: true,
   };
 
   beforeEach(async () => {
@@ -151,6 +152,7 @@ describe('PostsService', () => {
         nickname: '',
         password: '',
         profileImage: null,
+        emailVerified: true,
       };
       postsRepository.createQueryBuilder().getOne.mockReturnValue(post);
 
@@ -196,6 +198,7 @@ describe('PostsService', () => {
         nickname: '',
         password: '',
         profileImage: null,
+        emailVerified: true,
       };
       post.author = author;
       postsRepository.createQueryBuilder().getOne.mockReturnValue(post);

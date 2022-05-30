@@ -93,9 +93,7 @@ export class UsersService {
       where: { verificationCode },
       relations: ['user'],
     });
-
-    console.log(emailVerificationEntity);
-
+    
     if (emailVerificationEntity.expire_at < new Date()) {
       await this.sendVerificationEmail(emailVerificationEntity.user);
       throw new BadRequestException('유효기간이 경과했습니다. 다시 시도해주세요.');
@@ -127,12 +125,9 @@ export class UsersService {
     user: UserEntity,
   ): Promise<EmailVerificationEntity> {
     let entity = await this.emailVerificationsRepository.findOne({ where: { user } });
-    console.log(entity);
     if (!entity) {
-      console.log('들어옴!');
       entity = new EmailVerificationEntity();
       entity.user = user;
-      console.log(entity);
     }
     entity.verificationCode = uuid();
     entity.expire_at = entity.initExpireDate();

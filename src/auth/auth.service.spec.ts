@@ -76,9 +76,9 @@ describe('AuthService', () => {
       const req = httpMocks.createRequest();
       req.logout = jest.fn();
 
-      const result = service.logout(req);
+      service.logout(req);
 
-      expect(result).toBe('로그아웃 성공');
+      expect(req.logout).toBeCalled();
     });
   });
 });
