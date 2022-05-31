@@ -50,7 +50,7 @@ export class PostsController {
     description: '게시물 생성 성공시 생성된 게시물 반환',
     type: PostResponse,
   })
-  @ApiBadRequestResponse({
+  @ApiNotFoundResponse({
     description: '존재하지 않는 카테고리에 게시물 생성 시도시 에러',
     type: ExceptionResponse,
   })
@@ -143,16 +143,12 @@ export class PostsController {
     description: '수정된 게시물 반환',
     type: PostResponse,
   })
-  @ApiBadRequestResponse({
-    description: '존재하지 않는 카테고리로 게시물 수정 시도시 에러',
-    type: ExceptionResponse,
-  })
   @ApiUnauthorizedResponse({
     description: '로그인 되지 않은 상태에서 호출시 에러',
     type: ExceptionResponse,
   })
   @ApiNotFoundResponse({
-    description: '해당하는 id의 게시물을 찾을 수 없음',
+    description: '카테고리가 존재하지 않거나 존재하지 않는 게시물 수정 시도시 에러',
     type: ExceptionResponse,
   })
   @UseGuards(IsLoggedInGuard)

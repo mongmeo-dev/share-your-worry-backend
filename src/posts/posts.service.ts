@@ -139,7 +139,7 @@ export class PostsService {
     const isExist = await this.categoriesRepository.findOne({ id });
 
     if (!isExist) {
-      throw new BadRequestException('카테고리를 찾을 수 없습니다.');
+      throw new NotFoundException('카테고리를 찾을 수 없습니다.');
     }
   }
 
