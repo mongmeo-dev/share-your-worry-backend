@@ -11,6 +11,7 @@ import { ConfigService } from '@nestjs/config';
 import { HttpExceptionFilter } from './common/filter/http-exception.filter';
 import { ResponseInterceptor } from './common/interceptor/response.interceptor';
 import { LoggingInterceptor } from './common/interceptor/logging.interceptor';
+import * as AWS from 'aws-sdk';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -64,6 +65,11 @@ async function bootstrap() {
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
+
+  AWS.config.credentials = {
+    accessKeyId: configService.get('AWS_ACCESS_KEY_ID'),
+    secretAccessKey: configService.get('AWS_ACCESS_KEY_SECRET'),
+  };
 
   await app.listen(3000);
 }
