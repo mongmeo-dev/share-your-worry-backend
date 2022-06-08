@@ -37,11 +37,11 @@ export class UsersService {
 
     await this.sendVerificationEmail(newUser);
 
-    return this.utils.removePasswordFromUser(newUser);
+    return this.utils.userEntityToResponseDto(newUser);
   }
 
   async getCurrentUserInfo(loggedInUser: UserEntity) {
-    return this.utils.removePasswordFromUser(loggedInUser);
+    return this.utils.userEntityToResponseDto(loggedInUser);
   }
 
   async updateCurrentUser(
@@ -54,7 +54,7 @@ export class UsersService {
     }
 
     const updatedUser = await this.usersRepository.save({ ...loggedInUser, ...userUpdateDto });
-    return this.utils.removePasswordFromUser(updatedUser);
+    return this.utils.userEntityToResponseDto(updatedUser);
   }
 
   async logoutAndDeleteCurrentUser(request: Request, loggedInUser: UserEntity): Promise<void> {
@@ -70,7 +70,7 @@ export class UsersService {
       relations: ['author', 'category'],
     });
 
-    return posts.map((post) => this.utils.postEntityToPostResponseDto(post));
+    return posts.map((post) => this.utils.postEntityToResponseDto(post));
   }
 
   async uploadCurrentUserProfileImage(
@@ -85,7 +85,7 @@ export class UsersService {
 
     const savedUser = await this.usersRepository.save(loggedInUser);
 
-    return this.utils.removePasswordFromUser(savedUser);
+    return this.utils.userEntityToResponseDto(savedUser);
   }
 
   async verifyEmail(verificationCode: string): Promise<void> {
@@ -93,7 +93,7 @@ export class UsersService {
       where: { verificationCode },
       relations: ['user'],
     });
-    
+
     if (emailVerificationEntity.expire_at < new Date()) {
       await this.sendVerificationEmail(emailVerificationEntity.user);
       throw new BadRequestException('유효기간이 경과했습니다. 다시 시도해주세요.');

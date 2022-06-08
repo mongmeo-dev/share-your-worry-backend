@@ -62,7 +62,7 @@ describe('AuthService', () => {
 
     it('should return userResponseDto object', async () => {
       const userResponse = new UserResponseDto();
-      utils.removePasswordFromUser.mockReturnValue(userResponse);
+      utils.userEntityToResponseDto.mockReturnValue(userResponse);
       const loginData = { email: '', password: 'b' };
 
       const result = await service.validateUser(loginData.email, loginData.password);

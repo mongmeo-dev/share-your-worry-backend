@@ -8,17 +8,17 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class Utils {
-  removePasswordFromUser(user: UserEntity): UserResponseDto {
+  userEntityToResponseDto(user: UserEntity): UserResponseDto {
     const { password, ...responseData } = user;
     return responseData;
   }
 
-  postEntityToPostResponseDto(post: PostEntity): PostResponseDto {
-    return { ...post, author: this.removePasswordFromUser(post.author) };
+  postEntityToResponseDto(post: PostEntity): PostResponseDto {
+    return { ...post, author: this.userEntityToResponseDto(post.author) };
   }
 
-  commentsEntityToCommentResponseDto(comment: CommentEntity): CommentResponseDto {
+  commentsEntityToResponseDto(comment: CommentEntity): CommentResponseDto {
     const { post, ...data } = comment;
-    return { ...data, author: this.removePasswordFromUser(comment.author) };
+    return { ...data, author: this.userEntityToResponseDto(comment.author) };
   }
 }

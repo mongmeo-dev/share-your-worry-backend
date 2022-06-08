@@ -36,7 +36,7 @@ export class PostsService {
 
     const savedPost = await this.postsRepository.save({ ...postCreateDto, author: loggedInUser });
 
-    return this.utils.postEntityToPostResponseDto(savedPost);
+    return this.utils.postEntityToResponseDto(savedPost);
   }
 
   async getAllPostsCount(): Promise<number> {
@@ -62,12 +62,12 @@ export class PostsService {
       throw new BadRequestException('쿼리 파라미터는 양수 또는 0이어야 합니다.');
     }
 
-    return posts.map((post) => this.utils.postEntityToPostResponseDto(post));
+    return posts.map((post) => this.utils.postEntityToResponseDto(post));
   }
 
   async getPostById(id: number): Promise<PostResponseDto> {
     const post = await this.getPostByIdOrThrow404(id);
-    return this.utils.postEntityToPostResponseDto(post);
+    return this.utils.postEntityToResponseDto(post);
   }
 
   async updatePostById(
@@ -83,7 +83,7 @@ export class PostsService {
 
     const updatedPost = { ...post, ...postUpdateDto };
     const savedPost = await this.postsRepository.save(updatedPost);
-    return this.utils.postEntityToPostResponseDto(savedPost);
+    return this.utils.postEntityToResponseDto(savedPost);
   }
 
   async deletePostById(id: number, loggedInUser: UserEntity): Promise<void> {
@@ -119,7 +119,7 @@ export class PostsService {
       throw new BadRequestException('페이지, 아이템 사이즈는 0 또는 양수여야 합니다.');
     }
 
-    return comments.map((comment) => this.utils.commentsEntityToCommentResponseDto(comment));
+    return comments.map((comment) => this.utils.commentsEntityToResponseDto(comment));
   }
 
   async getCommentsCountByPostId(id: number) {

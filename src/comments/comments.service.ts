@@ -29,7 +29,7 @@ export class CommentsService {
 
     const savedComment = await this.commentsRepository.save({ ...commentCreateDto, author });
 
-    return this.utils.commentsEntityToCommentResponseDto(savedComment);
+    return this.utils.commentsEntityToResponseDto(savedComment);
   }
 
   async updateComment(
@@ -41,7 +41,7 @@ export class CommentsService {
     this.isAuthor(loggedInUser, comment);
 
     const savedComment = await this.commentsRepository.save({ ...comment, ...commentUpdateDto });
-    return this.utils.commentsEntityToCommentResponseDto(savedComment);
+    return this.utils.commentsEntityToResponseDto(savedComment);
   }
 
   async deleteComment(id: number, loggedInUser: UserEntity): Promise<void> {

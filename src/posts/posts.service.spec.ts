@@ -48,7 +48,7 @@ describe('PostsService', () => {
     categoriesRepository = module.get(getRepositoryToken(CategoryEntity));
     utils = module.get(Utils);
 
-    utils.postEntityToPostResponseDto.mockReturnValue(new PostResponseDto());
+    utils.postEntityToResponseDto.mockReturnValue(new PostResponseDto());
   });
 
   it('should be defined', () => {
@@ -67,10 +67,10 @@ describe('PostsService', () => {
       postsRepository.save.mockReturnValue(savedPost);
     });
 
-    it('should call utils.postEntityToPostResponseDto with saved post', async () => {
+    it('should call utils.postEntityToResponseDto with saved post', async () => {
       await service.createPost(loggedInUser, postCreateDto);
 
-      expect(utils.postEntityToPostResponseDto).toBeCalledWith(savedPost);
+      expect(utils.postEntityToResponseDto).toBeCalledWith(savedPost);
     });
 
     it('should return savedPost(is instance of PostResponseDto)', async () => {
@@ -121,14 +121,14 @@ describe('PostsService', () => {
       }
     });
 
-    it('should call utils.postEntityToPostResponseDto with found post', async () => {
+    it('should call utils.postEntityToResponseDto with found post', async () => {
       const post = new PostEntity();
       postsRepository.createQueryBuilder().getOne.mockReturnValue(post);
       // utils.postEntityToPostResponseDto.mockReturnValue(new PostResponseDto());
 
       await service.getPostById(1);
 
-      expect(utils.postEntityToPostResponseDto).toBeCalledWith(post);
+      expect(utils.postEntityToResponseDto).toBeCalledWith(post);
     });
   });
 
@@ -163,7 +163,7 @@ describe('PostsService', () => {
       }
     });
 
-    it('should call utils.postEntityToPostResponseDto with savedPost', async () => {
+    it('should call utils.postEntityToResponseDto with savedPost', async () => {
       const category: CategoryEntity = { id: 1, name: '' };
       const updatedPost = new PostEntity();
       post.author = loggedInUser;
@@ -174,7 +174,7 @@ describe('PostsService', () => {
 
       await service.updatePostById(1, loggedInUser, postUpdateDto);
 
-      expect(utils.postEntityToPostResponseDto).toBeCalledWith(updatedPost);
+      expect(utils.postEntityToResponseDto).toBeCalledWith(updatedPost);
     });
   });
 

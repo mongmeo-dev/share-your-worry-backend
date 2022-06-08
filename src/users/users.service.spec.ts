@@ -85,22 +85,22 @@ describe('UsersService', () => {
       }
     });
 
-    it('should call utils.removePasswordFromUser with savedUser', async () => {
+    it('should call utils.userEntityToResponseDto with savedUser', async () => {
       const savedUser = new UserEntity();
       usersRepository.findOne.mockReturnValue(null);
       usersRepository.save.mockReturnValue(savedUser);
 
       await service.join(joinDto);
 
-      expect(utils.removePasswordFromUser).toBeCalledWith(savedUser);
+      expect(utils.userEntityToResponseDto).toBeCalledWith(savedUser);
     });
   });
 
   describe('getCurrentUserInfo', () => {
-    it('should call utils.removePasswordFromUser with loggedInUser', async () => {
+    it('should call utils.userEntityToResponseDto with loggedInUser', async () => {
       await service.getCurrentUserInfo(loggedInUser);
 
-      expect(utils.removePasswordFromUser).toBeCalledWith(loggedInUser);
+      expect(utils.userEntityToResponseDto).toBeCalledWith(loggedInUser);
     });
   });
 
@@ -123,12 +123,12 @@ describe('UsersService', () => {
       expect(usersRepository.save).toBeCalled();
     });
 
-    it('should call utils.removePasswordFromUser with updatedUser', async () => {
+    it('should call utils.userEntityToResponseDto with updatedUser', async () => {
       const updatedUser = new UserEntity();
       usersRepository.save.mockReturnValue(updatedUser);
       await service.updateCurrentUser(loggedInUser, updateUserDto);
 
-      expect(utils.removePasswordFromUser).toBeCalledWith(updatedUser);
+      expect(utils.userEntityToResponseDto).toBeCalledWith(updatedUser);
     });
   });
 
@@ -159,13 +159,13 @@ describe('UsersService', () => {
       }
     });
 
-    it('should call utils.postEntityToPostResponseDto (posts.length) times', async () => {
+    it('should call utils.postEntityToResponseDto (posts.length) times', async () => {
       usersRepository.findOne.mockReturnValue(loggedInUser);
       postsRepository.find.mockReturnValue([1, 2, 3, 4, 5, 6, 7, 8, 9, 0]);
 
       await service.getAllPostsByUserId(1);
 
-      expect(utils.postEntityToPostResponseDto).toBeCalledTimes(10);
+      expect(utils.postEntityToResponseDto).toBeCalledTimes(10);
     });
   });
 });

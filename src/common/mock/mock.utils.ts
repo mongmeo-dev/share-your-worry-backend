@@ -1,5 +1,5 @@
 export const mockUtils = () => ({
-  removePasswordFromUser: jest.fn(),
-  postEntityToPostResponseDto: jest.fn(),
-  commentsEntityToCommentResponseDto: jest.fn(),
+  userEntityToResponseDto: jest.fn(),
+  postEntityToResponseDto: jest.fn(),
+  commentsEntityToResponseDto: jest.fn(),
 });

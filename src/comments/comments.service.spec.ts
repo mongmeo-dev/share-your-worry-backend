@@ -47,7 +47,7 @@ describe('CommentsService', () => {
     postsRepository = module.get(getRepositoryToken(PostEntity));
     utils = module.get(Utils);
 
-    utils.commentsEntityToCommentResponseDto.mockReturnValue(new CommentResponseDto());
+    utils.commentsEntityToResponseDto.mockReturnValue(new CommentResponseDto());
   });
 
   it('should be defined', () => {
@@ -75,7 +75,7 @@ describe('CommentsService', () => {
 
       const result = await service.createComment(commentCreateDto, author);
 
-      expect(utils.commentsEntityToCommentResponseDto).toBeCalledWith(newComment);
+      expect(utils.commentsEntityToResponseDto).toBeCalledWith(newComment);
       expect(result).toBeInstanceOf(CommentResponseDto);
     });
   });

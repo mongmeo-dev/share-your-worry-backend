@@ -18,7 +18,7 @@ export class AuthService {
     const user = await this.usersRepository.findOne({ where: { email } });
 
     if (user && (await bcrypt.compare(password, user.password))) {
-      return this.utils.removePasswordFromUser(user);
+      return this.utils.userEntityToResponseDto(user);
     }
 
     return null;

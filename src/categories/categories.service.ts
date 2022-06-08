@@ -47,7 +47,7 @@ export class CategoriesService {
     }
 
     return posts.map((post) => {
-      return this.utils.postEntityToPostResponseDto(post);
+      return this.utils.postEntityToResponseDto(post);
     });
   }
 
